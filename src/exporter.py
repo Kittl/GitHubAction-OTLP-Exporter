@@ -1,5 +1,6 @@
 from ghapi.all import GhApi
 from custom_parser import do_time,do_fastcore_decode,parse_attributes,check_env_vars
+import re
 import json
 import logging
 import os
@@ -12,6 +13,7 @@ from otel import otel_logger,otel_tracer,otel_meter,create_otel_attributes
 import requests
 import zipfile
 import dateutil.parser as dp
+import log_parser
 
 # Check if compulsory env variables are configured
 check_env_vars()
@@ -46,6 +48,10 @@ if "GITHUB_DEBUG" in os.environ and os.getenv('GITHUB_DEBUG').lower() == "true":
     logging.getLogger().setLevel(logging.DEBUG)
 else:
     pass
+
+CUSTOM_JOB_LOG_ATTS = log_parser.compile_patterns(os.getenv('CUSTOM_JOB_LOG_ATTS'))
+if CUSTOM_JOB_LOG_ATTS:
+    print("CUSTOM_JOB_LOG_ATTS", CUSTOM_JOB_LOG_ATTS)
 
 if OTLP_PROTOCOL in (None, ''):
     OTLP_PROTOCOL = "HTTP"
@@ -147,13 +153,28 @@ with zipfile.ZipFile("log.zip", 'r') as zip_ref:
 # Jobs trace span
 # Set Jobs tracer and logger
 pcontext = trace.set_span_in_context(p_parent)
-for job in job_lst:
+for job_index,job in enumerate(job_lst):
     try:
         print("Processing job ->",job['name'])
         child_0_attributes = create_otel_attributes(parse_attributes(job,"steps","job"),GITHUB_REPOSITORY_NAME)
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_ID] = job['run_id']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_URL_FULL] = job['html_url']
+
+        # Parse additional attributes from logs
+        if CUSTOM_JOB_LOG_ATTS:
+            # Logs in the archive are indexed in reverse order from how they appear in the job list.
+            job_number = len(job_lst) - job_index - 1
+            try:
+                # These logs are downloaded via GitHub API before enumerating jobs.
+                # Unfortunately GitHub docs do not mention structure of the logs archive, so this is based on observation.
+                # Example file name: "1_Build.txt"
+                with open ("./logs/"+str(job_number)+"_"+str(job['name'].replace("/",""))+".txt") as f:
+                    child_0_attributes.update(log_parser.parse_attributes_from_log(f, CUSTOM_JOB_LOG_ATTS))
+            except Exception as e:
+                print("Error parsing additional attributes from logs for job ->",job['name'],"<- due to error",e)
+
+
         child_0 = tracer.start_span(name=str(job['name']), attributes=child_0_attributes, context=pcontext,start_time=do_time(job['started_at']), kind=trace.SpanKind.CONSUMER)
         p_sub_context = trace.set_span_in_context(child_0)
 
