@@ -73,6 +73,8 @@ If you want to export to 2 locations, I'd recommend a single yaml file with sepa
 
 **GITHUB_DEBUG** - see [Troubleshooting](#Troubleshooting)
 
+**CUSTOM_JOB_LOG_ATTRS** - Allows additional attributes to be parsed from job logs based on specified patterns. Patterns are specified in key=value format, where key specifies attribute name and value is a regex pattern with a single capturing group referencing the value. Key-value pairs should be separated by newlines.
+
 ## Examples
 
 Traces are viewable in the Distributed Tracing app within Dynatrace. The service name will be your repository name:
