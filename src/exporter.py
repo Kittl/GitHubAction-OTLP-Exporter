@@ -39,6 +39,13 @@ GITHUB_REPOSITORY_OWNER=os.getenv('GITHUB_REPOSITORY_OWNER')
 
 EXPORTER_JOB_NAME=os.getenv('GITHUB_JOB').lower()
 
+class CICD_PIPELINE_SPAN_TYPE:
+    attr = 'cicd.pipeline.span_type'
+
+    WORKFLOW = 'workflow'
+    JOB = 'job'
+    STEP = 'step'
+
 # Check if debug is set
 if "GITHUB_DEBUG" in os.environ and os.getenv('GITHUB_DEBUG').lower() == "true":
     print("Running on DEBUG mode")
@@ -127,6 +134,7 @@ workflow_run_atts = json.loads(get_workflow_run_by_run_id)
 atts=parse_attributes(workflow_run_atts,"","workflow")
 atts[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
 atts[cicd_semconv.CICD_PIPELINE_RUN_ID] = WORKFLOW_RUN_ID
+atts[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.WORKFLOW
 print("Processing Workflow ->",WORKFLOW_RUN_NAME,"run id ->",WORKFLOW_RUN_ID)
 p_parent = tracer.start_span(name=str(WORKFLOW_RUN_NAME),attributes=atts,start_time=do_time(workflow_run_atts['run_started_at']),kind=trace.SpanKind.SERVER)
 
@@ -160,6 +168,7 @@ for job_index,job in enumerate(job_lst):
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_ID] = job['run_id']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_URL_FULL] = job['html_url']
+        child_0_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.JOB
 
         # Parse additional attributes from logs
         if CUSTOM_JOB_LOG_ATTS:
@@ -217,6 +226,7 @@ for job_index,job in enumerate(job_lst):
                         
                 child_1_attributes = create_otel_attributes(parse_attributes(step,"","job"),GITHUB_REPOSITORY_NAME)
                 child_1_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
+                child_1_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.STEP
                 child_1 = step_tracer.start_span(name=str(step['name']), attributes= child_1_attributes, start_time=do_time(step_started_at),context=p_sub_context,kind=trace.SpanKind.CONSUMER)
                 with trace.use_span(child_1, end_on_exit=False):
                     # Parse logs
