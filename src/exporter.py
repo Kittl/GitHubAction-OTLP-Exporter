@@ -211,6 +211,7 @@ for job_index,job in enumerate(job_lst):
                 step_tracer = otel_tracer(OTEL_EXPORTER_OTLP_ENDPOINT, headers, resource_log, "step_tracer", OTLP_PROTOCOL)
                 
                 resource_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
+                resource_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
                 resource_attributes.update(create_otel_attributes(parse_attributes(step,"","step"),GITHUB_REPOSITORY_NAME))
                 resource_log = Resource(attributes=resource_attributes)
                 job_logger = otel_logger(OTEL_EXPORTER_OTLP_ENDPOINT,headers,resource_log, "job_logger", OTLP_PROTOCOL)
