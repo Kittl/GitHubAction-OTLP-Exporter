@@ -166,6 +166,7 @@ for job_index,job in enumerate(job_lst):
         print("Processing job ->",job['name'])
         child_0_attributes = create_otel_attributes(parse_attributes(job,"steps","job"),GITHUB_REPOSITORY_NAME)
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
+        child_0_attributes[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_ID] = job['run_id']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_URL_FULL] = job['html_url']
         child_0_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.JOB
@@ -211,7 +212,6 @@ for job_index,job in enumerate(job_lst):
                 step_tracer = otel_tracer(OTEL_EXPORTER_OTLP_ENDPOINT, headers, resource_log, "step_tracer", OTLP_PROTOCOL)
                 
                 resource_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
-                resource_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
                 resource_attributes.update(create_otel_attributes(parse_attributes(step,"","step"),GITHUB_REPOSITORY_NAME))
                 resource_log = Resource(attributes=resource_attributes)
                 job_logger = otel_logger(OTEL_EXPORTER_OTLP_ENDPOINT,headers,resource_log, "job_logger", OTLP_PROTOCOL)
@@ -227,6 +227,8 @@ for job_index,job in enumerate(job_lst):
                         
                 child_1_attributes = create_otel_attributes(parse_attributes(step,"","job"),GITHUB_REPOSITORY_NAME)
                 child_1_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
+                child_1_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
+                child_1_attributes[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
                 child_1_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.STEP
                 child_1 = step_tracer.start_span(name=str(step['name']), attributes= child_1_attributes, start_time=do_time(step_started_at),context=p_sub_context,kind=trace.SpanKind.CONSUMER)
                 with trace.use_span(child_1, end_on_exit=False):
