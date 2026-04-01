@@ -1,5 +1,46 @@
 # Changelog
 
+## [4.0.0](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v3.2.5...v4.0.0) (2026-04-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add in gRPC option (yet to be tested)
+* **release:** Correction to commit format to trigger release PR
+
+### Features
+
+* Add basic metric for Workflow Jobs counter ([0b48ac0](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/0b48ac094342e6e689b2087e93dd68234b4c2116))
+* Add in gRPC option (yet to be tested) ([07ba488](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/07ba4885417ae711876e2522a79338f2209504c9))
+* Add optional configurations for Endpoint and Headers overrides ([d3625e1](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/d3625e15f88685f732310a9ec9df80d28ec9cbe6))
+* **custom_attr:** Parse custom attr from logs CU-86c7m38y9 ([#1](https://github.com/Kittl/GitHubAction-OTLP-Exporter/issues/1)) ([683d82c](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/683d82cec7c0657d6bab2af8f26c246edeba0c3c))
+* include workflow and job names in child spans - CU-86c9439pu ([#3](https://github.com/Kittl/GitHubAction-OTLP-Exporter/issues/3)) ([fb4f63d](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/fb4f63d5b3068c70fa08a069befb48c56e9e68c0))
+* introduce opentelemetry semconv fields, re-attempt metrics and fix duration of workflow ([7cda434](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/7cda434b00937a2339f4d4d57f1a2d90bcff80e9))
+* **release:** Correction to commit format to trigger release PR ([843f076](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/843f0763d7e35a95a8e595707bfe40f89be13d92))
+* **structure:** Fix file structure ([41c9029](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/41c90291dc247d504f47776e7c05b3e7ccb17020))
+* Update name ([10a039d](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/10a039d79a4ea381d6aa20e18d6c81a0804cceba))
+* Update to required key checking ([df2ae0e](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/df2ae0eda966dddd086dbdf148879b8b11294e27))
+
+
+### Bug Fixes
+
+* Add icon and colour for GitHub actions marketplace ([8ba69ec](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/8ba69ec0c56e30adaf10c371d7ff80322ea42b85))
+* Add in protocol to otel_tracer creation ([b947d31](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/b947d3116aca05c0644d545cc99a02cca416cc02))
+* Correction to variable name ([bb2857d](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/bb2857dc8f35ebcdc9c4a944396beecebcbb7e5d))
+* Fix to GRPC Exporter and update docs ([b9a1384](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/b9a13846063074e1cd89012644cf1b4fb59f3cd5))
+* Fix to OTLP endpoints ([b8212e4](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/b8212e42288cad51aa5226f32a85dac4b4bfe677))
+* Pushing minor change to create a new release version ([6da2589](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/6da258953909c608edc2b842248ca7a6448c1b2e))
+* revert metric changes ([fcec6d3](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/fcec6d341804c83528b1ed17c49c39ad0cf7d601))
+* switch to DELTA as preferred aggregation - Dynatrace error caused by using CUMULATIVE ([c9fb855](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/c9fb855b4580b4debbb1304001600bce9d4d00a5))
+* Update action.yml ([8520772](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/8520772b75b9d65297fce1acec3b92a3053253e9))
+* Update code to use standard counter for job counter ([5150caf](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/5150caf21cee898e8eaaee83e3b2186ca55f9b86))
+* Update example ([c730c4b](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/c730c4be81e3a8bc7d7618a9085f62aa18f9b8c9))
+* update example and add OTLP endpoint slash if missing ([8833aa9](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/8833aa97e1d0797d751e392efc4c44d45a313fe2))
+* Update example version number ([cc9da12](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/cc9da1264de2ecbebc32fddf01557a94737cba0f))
+* Update ReadMe and add NewRelic example ([5d5695a](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/5d5695adbf08279456dc281b6f94ea594f1f3ff3))
+* Updating README to trigger a release PR ([1de8b17](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/1de8b17c46cb5bbb7b0abe0906bc24b0c15ba847))
+* Use iterable for Aggregation preference ([2e69878](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/2e6987897abd7272b25e8abbb7492dd961bd9c4c))
+
 ## [3.2.5](https://github.com/StephenGoodall/OTLP-GitHubAction-Exporter/compare/v3.2.4...v3.2.5) (2025-04-07)
 
 
