@@ -274,7 +274,6 @@ for job_index,job in enumerate(job_lst):
                             
 
                 if step['conclusion'] == 'skipped' or step['conclusion'] == 'cancelled':
-                    child_1.update_name(name=str(step['name']+"-SKIPPED"))
                     if index >= 1:      
                         #End time should be the previous step end time
                         step_completed_at=job['steps'][index - 1]['completed_at']
