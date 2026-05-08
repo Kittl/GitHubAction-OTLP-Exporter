@@ -1,5 +1,19 @@
 from io import TextIOWrapper
+import os
 import re
+from glob import glob
+
+log_files_catalog = {}
+
+def catalog_log_files(dir: str) -> None:
+    logs = glob('*.txt', root_dir=dir)
+    log_files_catalog.update({ simplify_job_name(re.match(r'[0-9]*_(.*)\.txt', log)[1]): os.path.join(dir, log) for log in logs })
+
+def get_log_file(job_name: str) -> str:
+    return log_files_catalog[simplify_job_name(job_name)]
+
+def simplify_job_name(job_name: str) -> str:
+    return re.sub(r'[^0-9a-zA-Z]+', '', job_name).lower()
 
 def compile_patterns(patterns_string: str | None) -> dict[str,re.Pattern]:
     patterns = []
