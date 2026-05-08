@@ -39,6 +39,8 @@ GITHUB_REPOSITORY_OWNER=os.getenv('GITHUB_REPOSITORY_OWNER')
 
 EXPORTER_JOB_NAME=os.getenv('GITHUB_JOB').lower()
 
+CICD_REPOSITORY_NAME_ATTR = "cicd.pipeline.repository.name"
+
 class CICD_PIPELINE_SPAN_TYPE:
     attr = 'cicd.pipeline.span_type'
 
@@ -131,10 +133,11 @@ failed_job_counter = meter.create_counter(name="github.workflow.failed.job_count
 
 # Trace parent
 workflow_run_atts = json.loads(get_workflow_run_by_run_id)
-atts=parse_attributes(workflow_run_atts,"","workflow")
+atts=parse_attributes(workflow_run_atts,"workflow")
 atts[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
 atts[cicd_semconv.CICD_PIPELINE_RUN_ID] = WORKFLOW_RUN_ID
 atts[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.WORKFLOW
+atts[CICD_REPOSITORY_NAME_ATTR] = GITHUB_REPOSITORY_NAME
 print("Processing Workflow ->",WORKFLOW_RUN_NAME,"run id ->",WORKFLOW_RUN_ID)
 p_parent = tracer.start_span(name=str(WORKFLOW_RUN_NAME),attributes=atts,start_time=do_time(workflow_run_atts['run_started_at']),kind=trace.SpanKind.SERVER)
 
@@ -164,12 +167,13 @@ pcontext = trace.set_span_in_context(p_parent)
 for job_index,job in enumerate(job_lst):
     try:
         print("Processing job ->",job['name'])
-        child_0_attributes = create_otel_attributes(parse_attributes(job,"steps","job"),GITHUB_REPOSITORY_NAME)
+        child_0_attributes = create_otel_attributes(parse_attributes(job,"job"),GITHUB_REPOSITORY_NAME)
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_ID] = job['run_id']
         child_0_attributes[cicd_semconv.CICD_PIPELINE_TASK_RUN_URL_FULL] = job['html_url']
         child_0_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.JOB
+        child_0_attributes[CICD_REPOSITORY_NAME_ATTR] = GITHUB_REPOSITORY_NAME
 
         # Parse additional attributes from logs
         if CUSTOM_JOB_LOG_ATTS:
@@ -212,7 +216,7 @@ for job_index,job in enumerate(job_lst):
                 step_tracer = otel_tracer(OTEL_EXPORTER_OTLP_ENDPOINT, headers, resource_log, "step_tracer", OTLP_PROTOCOL)
                 
                 resource_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
-                resource_attributes.update(create_otel_attributes(parse_attributes(step,"","step"),GITHUB_REPOSITORY_NAME))
+                resource_attributes.update(create_otel_attributes(parse_attributes(step,"step"),GITHUB_REPOSITORY_NAME))
                 resource_log = Resource(attributes=resource_attributes)
                 job_logger = otel_logger(OTEL_EXPORTER_OTLP_ENDPOINT,headers,resource_log, "job_logger", OTLP_PROTOCOL)
 
@@ -225,11 +229,12 @@ for job_index,job in enumerate(job_lst):
                 else:
                     step_started_at=step['started_at']            
                         
-                child_1_attributes = create_otel_attributes(parse_attributes(step,"","job"),GITHUB_REPOSITORY_NAME)
+                child_1_attributes = create_otel_attributes(parse_attributes(step,"job"),GITHUB_REPOSITORY_NAME)
                 child_1_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME.replace("pipeline.task", "pipeline.task.step")] = step['name']
                 child_1_attributes[cicd_semconv.CICD_PIPELINE_TASK_NAME] = job['name']
                 child_1_attributes[cicd_semconv.CICD_PIPELINE_NAME] = str(WORKFLOW_RUN_NAME)
                 child_1_attributes[CICD_PIPELINE_SPAN_TYPE.attr] = CICD_PIPELINE_SPAN_TYPE.STEP
+                child_1_attributes[CICD_REPOSITORY_NAME_ATTR] = GITHUB_REPOSITORY_NAME
                 child_1 = step_tracer.start_span(name=str(step['name']), attributes= child_1_attributes, start_time=do_time(step_started_at),context=p_sub_context,kind=trace.SpanKind.CONSUMER)
                 with trace.use_span(child_1, end_on_exit=False):
                     # Parse logs

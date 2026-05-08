@@ -75,6 +75,49 @@ If you want to export to 2 locations, I'd recommend a single yaml file with sepa
 
 **CUSTOM_JOB_LOG_ATTRS** - Allows additional attributes to be parsed from job logs based on specified patterns. Patterns are specified in key=value format, where key specifies attribute name and value is a regex pattern with a single capturing group referencing the value. Key-value pairs should be separated by newlines.
 
+## Span attribute filtering
+
+The exporter uses an **allow list** to decide which GitHub API fields end up as span attributes. Anything not in the allow list is dropped. The lists are defined per span type in [src/custom_parser/__init__.py](src/custom_parser/__init__.py) and applied by `parse_attributes()`.
+
+Nested objects are flattened to dotted keys before matching.
+
+### Default allow lists
+
+| Span type | Allowed fields |
+|-----------|---------------|
+| Workflow | None (only the fields injected by the exporter, related to cicd.*) |
+| Job | `status`, `conclusion`, `started_at`, `completed_at`, `created_at`, `head_branch`, `head_sha`, `run_attempt`, `runner_group_id`, `runner_group_name`, `runner_id`, `runner_name` |
+| Step | `status`, `conclusion`, `number`, `started_at`, `completed_at` |
+
+For any allowed field ending in `_at`, a sibling `_ms` attribute is auto-generated with the timestamp in milliseconds (skipped when the parent object's `conclusion` is `skipped` or `cancelled`).
+
+### Explicitly set span attributes
+
+These are set directly in `exporter.py`, outside of `parse_attributes`, so they always appear regardless of the allow lists:
+
+| Attribute | Span types | Source |
+|-----------|-----------|--------|
+| `cicd.pipeline.name` | all | `WORKFLOW_RUN_NAME` env var |
+| `cicd.pipeline.run.id` | workflow, job | `WORKFLOW_RUN_ID` env var / `job.run_id` |
+| `cicd.pipeline.task.name` | job, step | `job.name` |
+| `cicd.pipeline.task.run.id` | job | `job.run_id` |
+| `cicd.pipeline.task.run.url.full` | job | `job.html_url` |
+| `cicd.pipeline.task.step.name` | step | `step.name` |
+| `cicd.pipeline.span_type` | all | `workflow` / `job` / `step` |
+| `cicd.pipeline.repository.name` | all | `GITHUB_REPOSITORY` env var |
+
+### Overriding defaults
+
+The allow lists can be overridden per-workflow via env vars in your `telemetry.yaml`. Each value is a single comma-separated string. Setting any of these **replaces** the entire default list for that span type:
+
+| Env var | Span type | Example |
+|---------|-----------|---------|
+| `GITHUB_ATTRS_ALLOW_WORKFLOW` | Workflow | `status,conclusion` |
+| `GITHUB_ATTRS_ALLOW_JOB` | Job | `status,conclusion,started_at,completed_at` |
+| `GITHUB_ATTRS_ALLOW_STEP` | Step | `status,conclusion,number,started_at,completed_at` |
+
+To allow a nested field, use its dotted path: e.g. `GITHUB_ATTRS_ALLOW_JOB="status,head_repository.owner.id"`.
+
 ## Examples
 
 Traces are viewable in the Distributed Tracing app within Dynatrace. The service name will be your repository name:
