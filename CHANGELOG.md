@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.1.0](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v4.0.0...v4.1.0) (2026-05-11)
+
+
+### Features
+
+* **span:** filter span attributes CU-86c93d7wd ([#8](https://github.com/Kittl/GitHubAction-OTLP-Exporter/issues/8)) ([35f4d37](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/35f4d3721d09ad2d4893341045b34a8d585488ea))
+
+
+### Bug Fixes
+
+* avoid attribute to remove ([35f4d37](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/35f4d3721d09ad2d4893341045b34a8d585488ea))
+* set workflow allowed to none ([35f4d37](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/35f4d3721d09ad2d4893341045b34a8d585488ea))
+* update docs ([35f4d37](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/35f4d3721d09ad2d4893341045b34a8d585488ea))
+* update repo name attribute ([35f4d37](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/35f4d3721d09ad2d4893341045b34a8d585488ea))
+
 ## [3.2.5](https://github.com/StephenGoodall/OTLP-GitHubAction-Exporter/compare/v3.2.4...v3.2.5) (2025-04-07)
 
 
