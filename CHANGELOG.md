@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.1](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v4.1.0...v4.1.1) (2026-07-15)
+
+
+### Bug Fixes
+
+* **dependency:** freeze ghapi and fastcore version CU-86caqm2h8 ([#10](https://github.com/Kittl/GitHubAction-OTLP-Exporter/issues/10)) ([fdec69c](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/fdec69cafa47b0f6e5404e25f8ddf9b58cda87d6))
+
 ## [4.1.0](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v4.0.0...v4.1.0) (2026-05-11)
 
 
