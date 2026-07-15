@@ -4,6 +4,8 @@ opentelemetry.exporter.otlp.proto.grpc
 opentelemetry.exporter.otlp.proto.http
 opentelemetry.instrumentation.logging
 pyrfc3339
-ghapi
+# ghapi 2.x is async-by-default and breaks our sync API calls
+ghapi<2
+fastcore<2
 requests
 python-dateutil
