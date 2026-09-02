@@ -1,4 +1,5 @@
 from io import TextIOWrapper
+import math
 import os
 import re
 from glob import glob
@@ -26,7 +27,15 @@ def compile_pattern(pattern_string: str) -> [str,re.Pattern]:
     parts = pattern_string.split('=')
     return parts[0].strip(), re.compile('='.join(parts[1:]))
 
-def parse_attributes_from_log(log_file: TextIOWrapper, patterns: dict[str,re.Pattern]) -> dict[str, str]:
+def coerce_captured_value(value: str) -> str | float:
+    # Convert a numeric capture to a float so backends can aggregate it.
+    try:
+        number = float(value)
+    except ValueError:
+        return value
+    return number if math.isfinite(number) else value
+
+def parse_attributes_from_log(log_file: TextIOWrapper, patterns: dict[str,re.Pattern]) -> dict[str, str | float]:
     # Copy patterns dictionary as we will be removing already matched patterns from it
     patterns = dict(patterns)
     attributes = {}
@@ -36,7 +45,7 @@ def parse_attributes_from_log(log_file: TextIOWrapper, patterns: dict[str,re.Pat
         for pattern_name, pattern in list(patterns.items()):
             match = pattern.match(line)
             if match:
-                attributes[pattern_name] = match.group(1)
+                attributes[pattern_name] = coerce_captured_value(match.group(1))
                 # Remove once match is found for efficiency
                 del patterns[pattern_name]
     print("Parsed attributes from logs:", attributes)
