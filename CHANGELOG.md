@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v4.1.1...v4.2.0) (2026-09-03)
+
+
+### Features
+
+* **parser:** coerse log attributes to float when number CU-86cb80zh1 ([#12](https://github.com/Kittl/GitHubAction-OTLP-Exporter/issues/12)) ([f43984b](https://github.com/Kittl/GitHubAction-OTLP-Exporter/commit/f43984b1a6abc1c471a66032335dae01ed89024a))
+
 ## [4.1.1](https://github.com/Kittl/GitHubAction-OTLP-Exporter/compare/v4.1.0...v4.1.1) (2026-07-15)
 
 
